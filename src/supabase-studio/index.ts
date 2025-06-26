@@ -85,7 +85,7 @@ export class SupabaseStudio extends Construct {
                 'env | grep -e NEXT_PUBLIC_ >> .env.production',
                 'cd ../',
                 'npx turbo@1.10.3 prune --scope=studio',
-                'npm clean-install',
+                'npm install',
               ],
             },
             build: {
