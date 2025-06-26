@@ -2698,7 +2698,7 @@ Object {
                 Object {
                   "Ref": "AWS::Region",
                 },
-                ":094274105915:layer:AWSLambdaPowertoolsTypeScript:23",
+                ":094274105915:layer:AWSLambdaPowertoolsTypeScript:25",
               ],
             ],
           },
@@ -2872,7 +2872,7 @@ Object {
                 Object {
                   "Ref": "AWS::Region",
                 },
-                ":094274105915:layer:AWSLambdaPowertoolsTypeScript:23",
+                ":094274105915:layer:AWSLambdaPowertoolsTypeScript:25",
               ],
             ],
           },
@@ -3624,7 +3624,7 @@ Object {
         "DatabaseClusterInstance1E154D1E9",
       ],
       "Properties": Object {
-        "Fingerprint": "3588f4b3167a4650ea4dfd3aea3e53facfba6a2fe38d749488dcb1623202b110",
+        "Fingerprint": "530e23e559653810f5c698b9e8972b00c67564a0c393f12b9963db3d82047a45",
         "ServiceToken": Object {
           "Fn::GetAtt": Array [
             "DatabaseMigrationProviderframeworkonEvent48D76DDA",
@@ -3649,7 +3649,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "67a7f982847312f00fe63a7caafa9e6daaa88c8fb1a0a471e5a41bbf18d1aab6.zip",
+          "S3Key": "eadc616ad9801a2b3d0bb77909080e4bfe9e0368ad9b2835f77c2f97dd163a04.zip",
         },
         "Description": "Supabase - Database migration function",
         "Environment": Object {
@@ -8695,11 +8695,7 @@ Object {
         "BasicAuthConfig": Object {
           "EnableBasicAuth": false,
         },
-        "BuildSpec": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "version: 1
+        "BuildSpec": "version: 1
 applications:
   - appRoot: studio
     frontend:
@@ -8722,30 +8718,7 @@ applications:
         postBuild:
           commands:
             - cd studio
-            - rsync -av --ignore-existing .next/standalone/",
-              Object {
-                "Fn::GetAtt": Array [
-                  "StudioRepositoryE0EFFBE2",
-                  "Name",
-                ],
-              },
-              "/studio/ .next/standalone/
-            - rsync -av --ignore-existing .next/standalone/",
-              Object {
-                "Fn::GetAtt": Array [
-                  "StudioRepositoryE0EFFBE2",
-                  "Name",
-                ],
-              },
-              "/node_modules/ .next/standalone/node_modules/
-            - rm -rf .next/standalone/",
-              Object {
-                "Fn::GetAtt": Array [
-                  "StudioRepositoryE0EFFBE2",
-                  "Name",
-                ],
-              },
-              "
+            - rsync -av --ignore-existing .next/standalone/studio/ .next/standalone/
             - cp .env .env.production .next/standalone/
             - rsync -av --ignore-existing public/ .next/standalone/public/
             - rsync -av --ignore-existing .next/static/ .next/standalone/.next/static/
@@ -8757,9 +8730,6 @@ applications:
         paths:
           - node_modules/**/*
 ",
-            ],
-          ],
-        },
         "CustomRules": Array [
           Object {
             "Source": "/<*>",
@@ -8868,13 +8838,9 @@ applications:
           ],
         },
         "Name": "SupabaseStudio",
+        "OauthToken": "{{resolve:secretsmanager:github-token:SecretString:token::}}",
         "Platform": "WEB_COMPUTE",
-        "Repository": Object {
-          "Fn::GetAtt": Array [
-            "StudioRepositoryE0EFFBE2",
-            "CloneUrlHttp",
-          ],
-        },
+        "Repository": "https://github.com/ProvorovOleksii/supabase-on-aws",
       },
       "Type": "AWS::Amplify::App",
     },
@@ -8913,266 +8879,6 @@ applications:
         "Stage": "PRODUCTION",
       },
       "Type": "AWS::Amplify::Branch",
-    },
-    "StudioRepositoryE0EFFBE2": Object {
-      "Properties": Object {
-        "RepositoryDescription": "Supabase/Studio/Repository",
-        "RepositoryName": Object {
-          "Ref": "AWS::StackName",
-        },
-      },
-      "Type": "AWS::CodeCommit::Repository",
-    },
-    "StudioRepositoryImportFunctionF87C7D62": Object {
-      "DependsOn": Array [
-        "StudioRepositoryImportFunctionServiceRoleDefaultPolicyA3265637",
-        "StudioRepositoryImportFunctionServiceRoleC6B8ED58",
-      ],
-      "Properties": Object {
-        "Code": Object {
-          "S3Bucket": Object {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "5c51be0641b6947a546a4837d3a851cf3e3b67f9b8a02fa6770621de03a50c45.zip",
-        },
-        "Description": "Clone to CodeCommit from remote repo (You can execute this function manually.)",
-        "Environment": Object {
-          "Variables": Object {
-            "SOURCE_BRANCH": Object {
-              "Ref": "StudioBranch",
-            },
-            "SOURCE_REPO": "https://github.com/supabase/supabase.git",
-            "TARGET_BRANCH": "main",
-            "TARGET_REPO": Object {
-              "Fn::Join": Array [
-                "",
-                Array [
-                  "codecommit::",
-                  Object {
-                    "Ref": "AWS::Region",
-                  },
-                  "://",
-                  Object {
-                    "Fn::GetAtt": Array [
-                      "StudioRepositoryE0EFFBE2",
-                      "Name",
-                    ],
-                  },
-                ],
-              ],
-            },
-          },
-        },
-        "EphemeralStorage": Object {
-          "Size": 3072,
-        },
-        "Handler": "index.handler",
-        "MemorySize": 3072,
-        "Role": Object {
-          "Fn::GetAtt": Array [
-            "StudioRepositoryImportFunctionServiceRoleC6B8ED58",
-            "Arn",
-          ],
-        },
-        "Runtime": "python3.9",
-        "Timeout": 300,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "StudioRepositoryImportFunctionServiceRoleC6B8ED58": Object {
-      "Properties": Object {
-        "AssumeRolePolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": Object {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": Array [
-          Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                "arn:",
-                Object {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "StudioRepositoryImportFunctionServiceRoleDefaultPolicyA3265637": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": "codecommit:GitPull",
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::GetAtt": Array [
-                  "StudioRepositoryE0EFFBE2",
-                  "Arn",
-                ],
-              },
-            },
-            Object {
-              "Action": "codecommit:GitPush",
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::GetAtt": Array [
-                  "StudioRepositoryE0EFFBE2",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "StudioRepositoryImportFunctionServiceRoleDefaultPolicyA3265637",
-        "Roles": Array [
-          Object {
-            "Ref": "StudioRepositoryImportFunctionServiceRoleC6B8ED58",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "StudioRepositoryImportProviderframeworkonEventFED45CDF": Object {
-      "DependsOn": Array [
-        "StudioRepositoryImportProviderframeworkonEventServiceRoleDefaultPolicy0FB1A847",
-        "StudioRepositoryImportProviderframeworkonEventServiceRoleABEB03CC",
-      ],
-      "Properties": Object {
-        "Code": Object {
-          "S3Bucket": Object {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "7382a0addb9f34974a1ea6c6c9b063882af874828f366f5c93b2b7b64db15c94.zip",
-        },
-        "Description": "AWS CDK resource provider framework - onEvent (Supabase/Studio/Repository/ImportProvider)",
-        "Environment": Object {
-          "Variables": Object {
-            "USER_ON_EVENT_FUNCTION_ARN": Object {
-              "Fn::GetAtt": Array [
-                "StudioRepositoryImportFunctionF87C7D62",
-                "Arn",
-              ],
-            },
-          },
-        },
-        "Handler": "framework.onEvent",
-        "Role": Object {
-          "Fn::GetAtt": Array [
-            "StudioRepositoryImportProviderframeworkonEventServiceRoleABEB03CC",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs18.x",
-        "Timeout": 900,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "StudioRepositoryImportProviderframeworkonEventServiceRoleABEB03CC": Object {
-      "Properties": Object {
-        "AssumeRolePolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": Object {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": Array [
-          Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                "arn:",
-                Object {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "StudioRepositoryImportProviderframeworkonEventServiceRoleDefaultPolicy0FB1A847": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": "lambda:InvokeFunction",
-              "Effect": "Allow",
-              "Resource": Array [
-                Object {
-                  "Fn::GetAtt": Array [
-                    "StudioRepositoryImportFunctionF87C7D62",
-                    "Arn",
-                  ],
-                },
-                Object {
-                  "Fn::Join": Array [
-                    "",
-                    Array [
-                      Object {
-                        "Fn::GetAtt": Array [
-                          "StudioRepositoryImportFunctionF87C7D62",
-                          "Arn",
-                        ],
-                      },
-                      ":*",
-                    ],
-                  ],
-                },
-              ],
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "StudioRepositoryImportProviderframeworkonEventServiceRoleDefaultPolicy0FB1A847",
-        "Roles": Array [
-          Object {
-            "Ref": "StudioRepositoryImportProviderframeworkonEventServiceRoleABEB03CC",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "StudioRepositorymain62C45C74": Object {
-      "DeletionPolicy": "Delete",
-      "DependsOn": Array [
-        "StudioAppProdBranchED7568CB",
-      ],
-      "Properties": Object {
-        "ServiceToken": Object {
-          "Fn::GetAtt": Array [
-            "StudioRepositoryImportProviderframeworkonEventFED45CDF",
-            "Arn",
-          ],
-        },
-        "SourceBranch": Object {
-          "Ref": "StudioBranch",
-        },
-        "SourceRepo": "https://github.com/supabase/supabase.git",
-      },
-      "Type": "Custom::RepoImportJob",
-      "UpdateReplacePolicy": "Delete",
     },
     "StudioRole199EAF11": Object {
       "Properties": Object {
@@ -9268,16 +8974,6 @@ applications:
                       "Ref": "JwtSecretServiceRoleKeyParameterB65536EB",
                     },
                   ],
-                ],
-              },
-            },
-            Object {
-              "Action": "codecommit:GitPull",
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::GetAtt": Array [
-                  "StudioRepositoryE0EFFBE2",
-                  "Arn",
                 ],
               },
             },
