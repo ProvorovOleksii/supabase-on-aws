@@ -84,14 +84,16 @@ export class SupabaseStudio extends Construct {
                 'env | grep -e SUPABASE_ >> .env.production',
                 'env | grep -e NEXT_PUBLIC_ >> .env.production',
                 'cd ../',
-                'npx turbo@1.10.3 prune --scope=studio',
-                'npm install',
+                'corepack enable',
+                'corepack prepare pnpm@latest --activate',
+                'pnpm install --frozen-lockfile',
+                'pnpm exec turbo@1.10.3 prune --scope=studio',
               ],
             },
             build: {
               commands: [
-                'npx turbo run build --scope=studio --include-dependencies --no-deps',
-                'npm prune --omit=dev',
+                'pnpm exec turbo run build --scope=studio --include-dependencies --no-deps',
+                'pnpm install --prod',
               ],
             },
             postBuild: {
