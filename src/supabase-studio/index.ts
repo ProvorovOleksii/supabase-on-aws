@@ -86,7 +86,7 @@ export class SupabaseStudio extends Construct {
                 'cd ../',
                 'corepack enable',
                 'corepack prepare pnpm@latest --activate',
-                'pnpm install --frozen-lockfile',
+                'pnpm install --frozen-lockfile --ignore-engines',
                 'pnpm exec turbo@1.10.3 prune --scope=studio',
               ],
             },
