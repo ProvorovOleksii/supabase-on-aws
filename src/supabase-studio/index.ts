@@ -35,7 +35,7 @@ export class SupabaseStudio extends Construct {
     const buildImage = 'public.ecr.aws/sam/build-nodejs18.x:latest';
     const sourceRepo = 'https://github.com/supabase/supabase.git';
     const sourceBranch = props.sourceBranch ?? 'master';
-    const appRoot = props.appRoot ?? 'apps/studio';
+    const appRoot = 'apps/studio';
     const { supabaseUrl, dbSecret, anonKey, serviceRoleKey } = props;
 
     // /** CodeCommit - Source Repository for Amplify Hosting */
@@ -50,7 +50,7 @@ export class SupabaseStudio extends Construct {
     /** GitHub source for Amplify Hosting */
     const gitHubProvider = new GitHubSourceCodeProvider({
       owner: 'ProvorovOleksii',
-      repository: 'supabase-on-aws',
+      repository: 'supabase',
       oauthToken: cdk.SecretValue.secretsManager('github-token', {
         jsonField: 'token',
       }),
@@ -139,8 +139,7 @@ export class SupabaseStudio extends Construct {
         DB_SECRET_ARN: dbSecret.secretArn,
         ANON_KEY_NAME: anonKey.parameterName,
         SERVICE_KEY_NAME: serviceRoleKey.parameterName,
-        // AMPLIFY_MONOREPO_APP_ROOT: appRoot,
-        AMPLIFY_MONOREPO_APP_ROOT: 'apps/studio',
+        AMPLIFY_MONOREPO_APP_ROOT: appRoot,
       },
       customRules: [{ source: '/<*>', target: '/index.html', status: amplify.RedirectStatus.NOT_FOUND_REWRITE }],
     });
@@ -149,13 +148,15 @@ export class SupabaseStudio extends Construct {
     (this.app.node.defaultChild as cdk.CfnResource).addPropertyOverride('Platform', 'WEB_COMPUTE');
 
     this.prodBranch = this.app.addBranch('ProdBranch', {
-      branchName: 'main',
+      branchName: 'master',
       stage: 'PRODUCTION',
       autoBuild: true,
       environmentVariables: {
         NEXT_PUBLIC_SITE_URL: `https://main.${this.app.appId}.amplifyapp.com`,
+        AMPLIFY_MONOREPO_APP_ROOT: appRoot,
       },
     });
+    this.prodBranch.addEnvironment('AMPLIFY_MONOREPO_APP_ROOT', appRoot);
     (this.prodBranch.node.defaultChild as cdk.CfnResource).addPropertyOverride('Framework', 'Next.js - SSR');
 
     // repoImportJob.node.addDependency(this.prodBranch.node.defaultChild!);
