@@ -70,7 +70,7 @@ export class SupabaseStudio extends Construct {
                 'env | grep -e SUPABASE_ >> .env.production',
                 'env | grep -e NEXT_PUBLIC_ >> .env.production',
                 'cd ../',
-                "export NODE_OPTIONS='--max-old-space-size=12000'",
+                "export NODE_OPTIONS='--max-old-space-size=65000'",
                 'corepack enable',
                 'corepack prepare pnpm@latest --activate',
                 'pnpm install --config.ignore-engines=true',
@@ -78,7 +78,7 @@ export class SupabaseStudio extends Construct {
             },
             build: {
               commands: [
-                'pnpm exec turbo run build --filter=studio...',
+                'pnpm exec turbo run build --filter=studio... --concurrency=2',
                 'pnpm install --prod',
               ],
             },
@@ -111,7 +111,8 @@ export class SupabaseStudio extends Construct {
       buildSpec,
       environmentVariables: {
         // for Amplify Hosting Build
-        NODE_OPTIONS: '--max-old-space-size=12000',
+        NODE_OPTIONS: '--max-old-space-size=65000',
+        TURBO_CONCURRENCY: '2',
         AMPLIFY_DIFF_DEPLOY: 'false',
         _CUSTOM_IMAGE: buildImage,
         // for Supabase
