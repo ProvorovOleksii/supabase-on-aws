@@ -32,8 +32,8 @@ export class SupabaseStudio extends Construct {
   constructor(scope: Construct, id: string, props: SupabaseStudioProps) {
     super(scope, id);
 
-    // public.ecr.aws/sam/build-nodejs22.x:1.140.0-20250605234713
-    const buildImage = 'public.ecr.aws/sam/build-nodejs18.x:latest';
+    // public.ecr.aws/sam/build-nodejs18.x:latest - old
+    const buildImage = 'public.ecr.aws/sam/build-nodejs22.x:1.140.0-20250605234713';
     const sourceRepo = 'https://github.com/supabase/supabase.git';
     const sourceBranch = props.sourceBranch ?? 'master';
     const appRoot = 'apps/studio';
