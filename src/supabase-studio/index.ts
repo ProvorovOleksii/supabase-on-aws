@@ -83,7 +83,7 @@ export class SupabaseStudio extends Construct {
             },
             postBuild: {
               commands: [
-                `cd ${appRoot}`,
+                // `cd ${appRoot}`,
                 `rsync -av --ignore-existing $(find .next/standalone -maxdepth 2 -type d -name "${appRoot}")/ .next/standalone/`, // check
                 'cp .env .env.production .next/standalone/',
                 'rsync -av --ignore-existing public/ .next/standalone/public/',
