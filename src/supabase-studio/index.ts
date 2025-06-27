@@ -93,7 +93,7 @@ export class SupabaseStudio extends Construct {
             },
             build: {
               commands: [
-                'pnpm exec turbo run build --scope=studio --include-dependencies --no-deps',
+                'pnpm exec turbo run build --filter=studio...',
                 'pnpm install --prod',
               ],
             },
