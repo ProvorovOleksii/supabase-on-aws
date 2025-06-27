@@ -70,6 +70,7 @@ export class SupabaseStudio extends Construct {
                 'env | grep -e SUPABASE_ >> .env.production',
                 'env | grep -e NEXT_PUBLIC_ >> .env.production',
                 'cd ../',
+                "export NODE_OPTIONS='--max-old-space-size=7000'",
                 'corepack enable',
                 'corepack prepare pnpm@latest --activate',
                 'pnpm install --config.ignore-engines=true',
@@ -110,7 +111,7 @@ export class SupabaseStudio extends Construct {
       buildSpec,
       environmentVariables: {
         // for Amplify Hosting Build
-        NODE_OPTIONS: '--max-old-space-size=4096',
+        NODE_OPTIONS: '--max-old-space-size=7000',
         AMPLIFY_DIFF_DEPLOY: 'false',
         _CUSTOM_IMAGE: buildImage,
         // for Supabase
