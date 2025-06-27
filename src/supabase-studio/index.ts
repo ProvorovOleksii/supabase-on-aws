@@ -30,7 +30,7 @@ export class SupabaseStudio extends Construct {
 
     // public.ecr.aws/sam/build-nodejs18.x:latest - old
     const buildImage = 'public.ecr.aws/sam/build-nodejs22.x:1.140.0-20250605234713';
-    const appRoot = 'out/apps/studio';
+    const appRoot = 'apps/studio';
     const { supabaseUrl, dbSecret, anonKey, serviceRoleKey } = props;
 
     /** GitHub source for Amplify Hosting */
@@ -72,8 +72,7 @@ export class SupabaseStudio extends Construct {
                 'cd ../',
                 'corepack enable',
                 'corepack prepare pnpm@latest --activate',
-                'pnpm install --frozen-lockfile --config.ignore-engines=true',
-                'pnpm exec turbo prune --scope=studio',
+                'pnpm install --config.ignore-engines=true',
               ],
             },
             build: {
@@ -84,7 +83,7 @@ export class SupabaseStudio extends Construct {
             },
             postBuild: {
               commands: [
-                // `cd ${appRoot}`,
+                `cd ${appRoot}`,
                 `rsync -av --ignore-existing $(find .next/standalone -maxdepth 2 -type d -name "${appRoot}")/ .next/standalone/`, // check
                 'cp .env .env.production .next/standalone/',
                 'rsync -av --ignore-existing public/ .next/standalone/public/',
