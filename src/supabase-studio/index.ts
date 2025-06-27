@@ -1,14 +1,10 @@
-import * as path from 'path';
 import * as amplify from '@aws-cdk/aws-amplify-alpha';
 import { GitHubSourceCodeProvider } from '@aws-cdk/aws-amplify-alpha';
 import * as cdk from 'aws-cdk-lib';
 import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
-// import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 import * as iam from 'aws-cdk-lib/aws-iam';
-// import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
-import * as cr from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 
 interface SupabaseStudioProps {
@@ -34,19 +30,8 @@ export class SupabaseStudio extends Construct {
 
     // public.ecr.aws/sam/build-nodejs18.x:latest - old
     const buildImage = 'public.ecr.aws/sam/build-nodejs22.x:1.140.0-20250605234713';
-    const sourceRepo = 'https://github.com/supabase/supabase.git';
-    const sourceBranch = props.sourceBranch ?? 'master';
     const appRoot = 'apps/studio';
     const { supabaseUrl, dbSecret, anonKey, serviceRoleKey } = props;
-
-    // /** CodeCommit - Source Repository for Amplify Hosting */
-    // const repository = new Repository(this, 'Repository', {
-    //   repositoryName: cdk.Aws.STACK_NAME,
-    //   description: `${this.node.path}/Repository`,
-    // });
-
-    // /** Import from GitHub to CodeComit */
-    // const repoImportJob = repository.importFromUrl(sourceRepo, sourceBranch);
 
     /** GitHub source for Amplify Hosting */
     const gitHubProvider = new GitHubSourceCodeProvider({
@@ -88,7 +73,7 @@ export class SupabaseStudio extends Construct {
                 'corepack enable',
                 'corepack prepare pnpm@latest --activate',
                 'pnpm install --frozen-lockfile --config.ignore-engines=true',
-                'pnpm exec turbo prune --scope=studio',
+                'pnpm exec turbo prune --scope=studio --out apps/studio',
               ],
             },
             build: {
@@ -100,12 +85,8 @@ export class SupabaseStudio extends Construct {
             postBuild: {
               commands: [
                 `cd ${appRoot}`,
-                // `rsync -av --ignore-existing .next/standalone/${repository.repositoryName}/${appRoot}/ .next/standalone/`,
-                // `rsync -av --ignore-existing .next/standalone/${repository.repositoryName}/node_modules/ .next/standalone/node_modules/`,
-                // `rm -rf .next/standalone/${repository.repositoryName}`,
                 `rsync -av --ignore-existing $(find .next/standalone -maxdepth 2 -type d -name "${appRoot}")/ .next/standalone/`, // check
                 'cp .env .env.production .next/standalone/',
-                // https://nextjs.org/docs/advanced-features/output-file-tracing#automatically-copying-traced-files
                 'rsync -av --ignore-existing public/ .next/standalone/public/',
                 'rsync -av --ignore-existing .next/static/ .next/standalone/.next/static/',
               ],
@@ -191,61 +172,3 @@ export class SupabaseStudio extends Construct {
   }
 
 }
-
-// export class Repository extends codecommit.Repository {
-//   readonly importFunction: lambda.Function;
-//   readonly importProvider: cr.Provider;
-
-//   /** CodeCommit to sync with GitHub */
-//   constructor(scope: Construct, id: string, props: codecommit.RepositoryProps) {
-//     super(scope, id, props);
-
-//     this.importFunction = new lambda.Function(this, 'ImportFunction', {
-//       description: 'Clone to CodeCommit from remote repo (You can execute this function manually.)',
-//       runtime: lambda.Runtime.PYTHON_3_12,
-//       code: lambda.Code.fromAsset(path.resolve(__dirname, 'cr-import-repo'), {
-//         bundling: {
-//           image: cdk.DockerImage.fromRegistry('public.ecr.aws/sam/build-python3.12:latest-x86_64'),
-//           command: [
-//             '/bin/bash', '-c', [
-//               'mkdir -p /var/task/local/{bin,lib}',
-//               'cp /usr/bin/git /usr/libexec/git-core/git-remote-https /usr/libexec/git-core/git-remote-http /var/task/local/bin',
-//               'ldd /usr/bin/git | awk \'NF == 4 { system("cp " $3 " /var/task/local/lib/") }\'',
-//               'ldd /usr/libexec/git-core/git-remote-https | awk \'NF == 4 { system("cp " $3 " /var/task/local/lib/") }\'',
-//               'ldd /usr/libexec/git-core/git-remote-http | awk \'NF == 4 { system("cp " $3 " /var/task/local/lib/") }\'',
-//               'pip install -r requirements.txt -t /var/task',
-//               'cp -au /asset-input/index.py /var/task',
-//               'cp -aur /var/task/* /asset-output',
-//             ].join('&&'),
-//           ],
-//           user: 'root',
-//         },
-//       }),
-//       handler: 'index.handler',
-//       memorySize: 4096,
-//       ephemeralStorageSize: cdk.Size.gibibytes(3),
-//       timeout: cdk.Duration.minutes(15),
-//       environment: {
-//         TARGET_REPO: this.repositoryCloneUrlGrc,
-//       },
-//     });
-//     this.grantPullPush(this.importFunction);
-
-//     this.importProvider = new cr.Provider(this, 'ImportProvider', { onEventHandler: this.importFunction });
-//   }
-
-//   importFromUrl(sourceRepoUrlHttp: string, sourceBranch: string, targetBranch: string = 'main') {
-//     this.importFunction.addEnvironment('SOURCE_REPO', sourceRepoUrlHttp);
-//     this.importFunction.addEnvironment('SOURCE_BRANCH', sourceBranch);
-//     this.importFunction.addEnvironment('TARGET_BRANCH', targetBranch);
-
-//     return new cdk.CustomResource(this, targetBranch, {
-//       resourceType: 'Custom::RepoImportJob',
-//       serviceToken: this.importProvider.serviceToken,
-//       properties: {
-//         SourceRepo: sourceRepoUrlHttp,
-//         SourceBranch: sourceBranch,
-//       },
-//     });
-//   }
-// }
