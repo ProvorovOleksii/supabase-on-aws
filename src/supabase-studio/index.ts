@@ -81,18 +81,17 @@ export class SupabaseStudio extends Construct {
                 'pnpm install --prod',
               ],
             },
-            postBuild: {
-              commands: [
-                // `cd ${appRoot}`,
-                `rsync -av --ignore-existing $(find .next/standalone -maxdepth 2 -type d -name "${appRoot}")/ .next/standalone/`, // check
-                'cp .env .env.production .next/standalone/',
-                'rsync -av --ignore-existing public/ .next/standalone/public/',
-                'rsync -av --ignore-existing .next/static/ .next/standalone/.next/static/',
-              ],
-            },
+            // postBuild: {
+            //   commands: [
+            //     `rsync -av --ignore-existing $(find .next/standalone -maxdepth 2 -type d -name "${appRoot}")/ .next/standalone/`, // check
+            //     'cp .env .env.production .next/standalone/',
+            //     'rsync -av --ignore-existing public/ .next/standalone/public/',
+            //     'rsync -av --ignore-existing .next/static/ .next/standalone/.next/static/',
+            //   ],
+            // },
           },
           artifacts: {
-            baseDirectory: '.next',
+            baseDirectory: '.next/standalone',
             files: ['**/*'],
           },
           cache: {
