@@ -63,6 +63,12 @@ export class SupabaseStudio extends Construct {
           phases: {
             preBuild: {
               commands: [
+                // enable swap
+                'dd if=/dev/zero of=/tmp/swapfile bs=1M count=8192',
+                'mkswap /tmp/swapfile',
+                'swapon /tmp/swapfile',
+                'free -h',
+                //
                 'echo POSTGRES_PASSWORD=$(aws secretsmanager get-secret-value --secret-id $DB_SECRET_ARN --query SecretString | jq -r . | jq -r .password) >> .env.production',
                 'echo SUPABASE_ANON_KEY=$(aws ssm get-parameter --region $SUPABASE_REGION --name $ANON_KEY_NAME --query Parameter.Value) >> .env.production',
                 'echo SUPABASE_SERVICE_KEY=$(aws ssm get-parameter --region $SUPABASE_REGION --name $SERVICE_KEY_NAME --query Parameter.Value) >> .env.production',
@@ -73,23 +79,15 @@ export class SupabaseStudio extends Construct {
                 "export NODE_OPTIONS='--max-old-space-size=65000'",
                 'corepack enable',
                 'corepack prepare pnpm@latest --activate',
-                'pnpm install --config.ignore-engines=true',
+                'pnpm install --filter=studio... --config.ignore-engines=true',
               ],
             },
             build: {
               commands: [
-                'pnpm exec turbo run build --filter=studio... --concurrency=2',
+                'pnpm exec turbo run build --filter=studio... --concurrency=1',
                 'pnpm install --prod',
               ],
             },
-            // postBuild: {
-            //   commands: [
-            //     `rsync -av --ignore-existing $(find .next/standalone -maxdepth 2 -type d -name "${appRoot}")/ .next/standalone/`, // check
-            //     'cp .env .env.production .next/standalone/',
-            //     'rsync -av --ignore-existing public/ .next/standalone/public/',
-            //     'rsync -av --ignore-existing .next/static/ .next/standalone/.next/static/',
-            //   ],
-            // },
           },
           artifacts: {
             baseDirectory: '.next/standalone',
